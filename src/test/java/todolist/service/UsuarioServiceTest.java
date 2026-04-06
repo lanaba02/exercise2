@@ -153,4 +153,42 @@ public class UsuarioServiceTest {
         assertThat(usuario.getEmail()).isEqualTo("richard@umh.es");
         assertThat(usuario.getNombre()).isEqualTo("Richard Stallman");
     }
+
+    @Test
+    public void servicioFindAllUsuarios() {
+        // GIVEN
+        // Dos usuarios en la BD
+        Long usuarioId1 = addUsuarioBD();
+
+        UsuarioData usuario2 = new UsuarioData();
+        usuario2.setEmail("lana@umh.es");
+        usuario2.setNombre("Lana Barisic");
+        usuario2.setPassword("5678");
+        UsuarioData nuevoUsuario2 = usuarioService.registrar(usuario2);
+        Long usuarioId2 = nuevoUsuario2.getId();
+
+        // WHEN
+        // recuperamos todos los usuarios
+        Iterable<UsuarioData> usuarios = usuarioService.findAll();
+
+        // THEN
+        // obtenemos los dos usuarios registrados
+        assertThat(usuarios).hasSize(2);
+
+        // Verificamos que ambos usuarios están en la lista
+        boolean foundUsuario1 = false;
+        boolean foundUsuario2 = false;
+
+        for (UsuarioData u : usuarios) {
+            if (u.getId().equals(usuarioId1) && u.getEmail().equals("richard@umh.es")) {
+                foundUsuario1 = true;
+            }
+            if (u.getId().equals(usuarioId2) && u.getEmail().equals("lana@umh.es")) {
+                foundUsuario2 = true;
+            }
+        }
+
+        assertThat(foundUsuario1).isTrue();
+        assertThat(foundUsuario2).isTrue();
+    }
 }
