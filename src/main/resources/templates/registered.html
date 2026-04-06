@@ -15,12 +15,16 @@
                     <tr>
                         <th>ID</th>
                         <th>Email</th>
+                        <th>Description</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr th:each="usuario : ${usuarios}">
                         <td th:text="${usuario.id}"></td>
                         <td th:text="${usuario.email}"></td>
+                        <td>
+                            <a th:href="@{/registered/{id}(id=${usuario.id})}" class="btn btn-primary btn-sm">View Details</a>
+                        </td>
                     </tr>
                 </tbody>
             </table>
