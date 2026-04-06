@@ -12,6 +12,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -90,7 +91,52 @@ public class RegisteredUsersControllerTest {
                         containsString("<thead"),     // Table header
                         containsString("<tbody"),     // Table body
                         containsString("ID"),         // ID column header
-                        containsString("Email")       // Email column header
+                        containsString("Email"),      // Email column header
+                        containsString("Description") // Description column header
+                )));
+    }
+
+    @Test
+    public void userDescriptionPageShowsUserDetails() throws Exception {
+        // GIVEN
+        // A user in the database
+        Long usuarioId = addUsuarioBD();
+
+        // WHEN, THEN
+        // The user description page shows user details (excluding password)
+        this.mockMvc.perform(get("/registered/" + usuarioId))
+                .andExpect(status().isOk())
+                .andExpect(content().string(allOf(
+                        containsString("User Description"),  // Page title
+                        containsString("lana@umh.es"),        // User email
+                        containsString("Lana Barisic"),      // User name
+                        containsString(usuarioId.toString()), // User ID
+                        not(containsString("1234"))          // Password should NOT be shown
+                )));
+    }
+
+    @Test
+    public void userDescriptionPageRedirectsForNonExistentUser() throws Exception {
+        // WHEN, THEN
+        // Accessing a non-existent user redirects to user list
+        this.mockMvc.perform(get("/registered/999"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/registered"));
+    }
+
+    @Test
+    public void registeredUsersPageHasDescriptionLinks() throws Exception {
+        // GIVEN
+        // A user in the database
+        Long usuarioId = addUsuarioBD();
+
+        // WHEN, THEN
+        // The registered users page contains description links
+        this.mockMvc.perform(get("/registered"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(allOf(
+                        containsString("View Details"),      // Link text
+                        containsString("/registered/" + usuarioId) // Link URL
                 )));
     }
 }

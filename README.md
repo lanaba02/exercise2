@@ -189,6 +189,67 @@ The user list uses a simple table structure to display user information:
 
 ---
 
+### User Description Implementation
+
+#### Overview
+The user description feature provides detailed information for individual users accessible from the user list. Each user in the registered users table has a "View Details" link that leads to a dedicated page showing all user information except the password. The path follows the pattern `/registered/{id}`.
+
+#### New Classes & Methods
+
+##### Controller Layer
+- **`HomeController.java`**: Added `userDescription()` method
+  - `userDescription(@PathVariable Long id, Model model)`: Handles `/registered/{id}` requests, retrieves user by ID, and redirects to user list if user doesn't exist
+
+#### New Thymeleaf Templates
+
+##### `userDescription.html`
+The user description template that displays:
+- User ID, email, name, and birth date
+- Excludes password for security
+- Formatted birth date display with fallback for null values
+- Navigation back to user list
+- Integrated navbar for consistent navigation
+
+##### Updated `registered.html`
+Enhanced the user list template with:
+- Added "Description" column header
+- "View Details" button for each user linking to `/registered/{id}`
+
+#### Implementation Details
+
+The user description page uses a Bootstrap card layout to display user information:
+
+```html
+<dl class="row">
+    <dt class="col-sm-4">ID:</dt>
+    <dd class="col-sm-8" th:text="${usuario.id}"></dd>
+    <dt class="col-sm-4">Email:</dt>
+    <dd class="col-sm-8" th:text="${usuario.email}"></dd>
+    <dt class="col-sm-4">Name:</dt>
+    <dd class="col-sm-8" th:text="${usuario.nombre}"></dd>
+    <dt class="col-sm-4">Birth Date:</dt>
+    <dd class="col-sm-8" th:text="${usuario.fechaNacimiento != null ? #temporals.format(usuario.fechaNacimiento, 'dd/MM/yyyy') : 'Not specified'}"></dd>
+</dl>
+```
+
+#### Tests Implemented
+
+##### `RegisteredUsersControllerTest.java` (4 additional test cases)
+- **`userDescriptionPageShowsUserDetails()`**: Validates that user details are displayed correctly (excluding password)
+- **`userDescriptionPageRedirectsForNonExistentUser()`**: Ensures non-existent users redirect to user list
+- **`registeredUsersPageHasDescriptionLinks()`**: Confirms "View Details" links are present in user list
+- **`registeredUsersPageHasTableStructure()`**: Updated to verify the new Description column
+
+#### Key Features
+1. **Secure Data Display**: Shows all user fields except password
+2. **Error Handling**: Redirects to user list for non-existent users
+3. **Responsive Design**: Bootstrap card layout adapts to screen sizes
+4. **Date Formatting**: Proper date display with null handling
+5. **Navigation**: Easy return to user list with back button
+6. **Consistent UI**: Maintains navbar integration across pages
+
+---
+
 ## Repositories & Images
 
 - **GitHub Repository**: [lanaba02/exercise2](https://github.com/lanaba02/exercise2)

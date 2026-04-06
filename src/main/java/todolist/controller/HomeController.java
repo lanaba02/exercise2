@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @Controller
 public class HomeController {
@@ -38,5 +39,15 @@ public class HomeController {
         Iterable<UsuarioData> usuarios = usuarioService.findAll();
         model.addAttribute("usuarios", usuarios);
         return "registered";
+    }
+
+    @GetMapping("/registered/{id}")
+    public String userDescription(@PathVariable Long id, Model model) {
+        UsuarioData usuario = usuarioService.findById(id);
+        if (usuario == null) {
+            return "redirect:/registered";
+        }
+        model.addAttribute("usuario", usuario);
+        return "userDescription";
     }
 }
