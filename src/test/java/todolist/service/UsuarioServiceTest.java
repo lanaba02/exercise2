@@ -246,4 +246,39 @@ public class UsuarioServiceTest {
         assertThat(usuarioBD).isNotNull();
         assertThat(usuarioBD.getAdmin()).isTrue();
     }
+
+    @Test
+    public void servicioToggleUserEnabled() {
+        // GIVEN
+        // Un usuario habilitado en la BD
+        Long usuarioId = addUsuarioBD();
+        UsuarioData usuarioBefore = usuarioService.findById(usuarioId);
+        assertThat(usuarioBefore.getEnabled()).isTrue();
+
+        // WHEN
+        // Deshabilitamos el usuario
+        usuarioService.toggleUserEnabled(usuarioId);
+
+        // THEN
+        // El usuario ahora está deshabilitado
+        UsuarioData usuarioAfter = usuarioService.findById(usuarioId);
+        assertThat(usuarioAfter.getEnabled()).isFalse();
+    }
+
+    @Test
+    public void servicioToggleUserEnabledTwice() {
+        // GIVEN
+        // Un usuario habilitado en la BD
+        Long usuarioId = addUsuarioBD();
+
+        // WHEN
+        // Deshabilitamos y luego habilitamos el usuario
+        usuarioService.toggleUserEnabled(usuarioId);
+        usuarioService.toggleUserEnabled(usuarioId);
+
+        // THEN
+        // El usuario vuelve a estar habilitado
+        UsuarioData usuario = usuarioService.findById(usuarioId);
+        assertThat(usuario.getEnabled()).isTrue();
+    }
 }
