@@ -95,4 +95,13 @@ public class UsuarioService {
         }
         return false;
     }
+
+    @Transactional
+    public void toggleUserEnabled(Long usuarioId) {
+        Usuario usuario = usuarioRepository.findById(usuarioId).orElse(null);
+        if (usuario != null) {
+            usuario.setEnabled(!Boolean.TRUE.equals(usuario.getEnabled()));
+            usuarioRepository.save(usuario);
+        }
+    }
 }

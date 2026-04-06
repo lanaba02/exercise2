@@ -45,6 +45,12 @@ public class LoginController {
         if (loginStatus == UsuarioService.LoginStatus.LOGIN_OK) {
             UsuarioData usuario = usuarioService.findByEmail(loginData.geteMail());
 
+            // Check if user is enabled
+            if (!Boolean.TRUE.equals(usuario.getEnabled())) {
+                model.addAttribute("error", "User account is disabled. Contact administrator.");
+                return "formLogin";
+            }
+
             managerUserSession.logearUsuario(usuario.getId());
 
             // Redirect admin users to user list, regular users to their tasks

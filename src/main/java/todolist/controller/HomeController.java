@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import todolist.controller.exception.UsuarioNoAdminException;
 
 @Controller
@@ -63,5 +64,12 @@ public class HomeController {
         }
         model.addAttribute("usuario", usuario);
         return "userDescription";
+    }
+
+    @PostMapping("/registered/{id}/toggle-status")
+    public String toggleUserStatus(@PathVariable Long id) {
+        comprobarUsuarioAdmin();
+        usuarioService.toggleUserEnabled(id);
+        return "redirect:/registered";
     }
 }
