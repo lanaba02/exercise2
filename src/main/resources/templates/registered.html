@@ -15,7 +15,9 @@
                     <tr>
                         <th>ID</th>
                         <th>Email</th>
+                        <th>Status</th>
                         <th>Description</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -23,7 +25,17 @@
                         <td th:text="${usuario.id}"></td>
                         <td th:text="${usuario.email}"></td>
                         <td>
+                            <span th:if="${usuario.enabled}" class="badge bg-success">Enabled</span>
+                            <span th:unless="${usuario.enabled}" class="badge bg-danger">Disabled</span>
+                        </td>
+                        <td>
                             <a th:href="@{/registered/{id}(id=${usuario.id})}" class="btn btn-primary btn-sm">View Details</a>
+                        </td>
+                        <td>
+                            <form th:action="@{/registered/{id}/toggle-status(id=${usuario.id})}" method="post" style="display:inline;">
+                                <button th:if="${usuario.enabled}" type="submit" class="btn btn-danger btn-sm">Disable</button>
+                                <button th:unless="${usuario.enabled}" type="submit" class="btn btn-success btn-sm">Enable</button>
+                            </form>
                         </td>
                     </tr>
                 </tbody>

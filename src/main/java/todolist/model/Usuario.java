@@ -26,6 +26,8 @@ public class Usuario implements Serializable {
     private Date fechaNacimiento;
     @Column(name = "admin")
     private Boolean admin = false;
+    @Column(name = "enabled")
+    private Boolean enabled = true;
 
     // La relación es lazy por defecto,
     // es necesario acceder a la lista de tareas para que se carguen
@@ -89,6 +91,14 @@ public class Usuario implements Serializable {
 
     public void setAdmin(Boolean admin) {
         this.admin = admin;
+    }
+
+    public Boolean getEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
     }
 
     // Getters y setters de la relación

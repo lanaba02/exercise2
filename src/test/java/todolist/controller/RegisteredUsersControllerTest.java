@@ -18,7 +18,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-import java.util.List;
+import java.util.Arrays;
+import java.util.Collections;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -35,21 +36,9 @@ public class RegisteredUsersControllerTest {
     private UsuarioService usuarioService;
 
     /**
-     * Helper method to add a user to the database
-     */
-    Long addUsuarioBD() {
-        UsuarioData usuario = new UsuarioData();
-        usuario.setEmail("lana@umh.es");
-        usuario.setNombre("Lana Barisic");
-        usuario.setPassword("1234");
-        UsuarioData nuevoUsuario = usuarioService.registrar(usuario);
-        return nuevoUsuario.getId();
-    }
-
-    /**
      * Helper method to add an admin user to the database and mock login
      */
-    Long loginAsAdmin() {
+    void loginAsAdmin() {
         UsuarioData admin = new UsuarioData();
         admin.setId(1L);
         admin.setEmail("admin@umh.es");
@@ -61,8 +50,6 @@ public class RegisteredUsersControllerTest {
         when(managerUserSession.usuarioLogeado()).thenReturn(1L);
         // Mock the UsuarioService to return the admin user
         when(usuarioService.findById(1L)).thenReturn(admin);
-
-        return 1L;
     }
 
     @Test
@@ -82,7 +69,7 @@ public class RegisteredUsersControllerTest {
         user2.setEmail("richard@umh.es");
         user2.setNombre("Richard Stallman");
 
-        when(usuarioService.findAll()).thenReturn(List.of(user1, user2));
+        when(usuarioService.findAll()).thenReturn(Arrays.asList(user1, user2));
 
         // WHEN, THEN
         // The registered users page is requested and contains both users
@@ -104,7 +91,7 @@ public class RegisteredUsersControllerTest {
         loginAsAdmin();
 
         // Mock findAll to return empty list
-        when(usuarioService.findAll()).thenReturn(List.of());
+        when(usuarioService.findAll()).thenReturn(Collections.emptyList());
 
         // WHEN, THEN
         // The registered users page is requested and shows empty message
@@ -127,7 +114,7 @@ public class RegisteredUsersControllerTest {
         user.setId(2L);
         user.setEmail("lana@umh.es");
         user.setNombre("Lana Barisic");
-        when(usuarioService.findAll()).thenReturn(List.of(user));
+        when(usuarioService.findAll()).thenReturn(Collections.singletonList(user));
 
         // WHEN, THEN
         // The registered users page contains proper table structure
@@ -197,7 +184,7 @@ public class RegisteredUsersControllerTest {
         user.setId(2L);
         user.setEmail("lana@umh.es");
         user.setNombre("Lana Barisic");
-        when(usuarioService.findAll()).thenReturn(List.of(user));
+        when(usuarioService.findAll()).thenReturn(Collections.singletonList(user));
 
         // WHEN, THEN
         // The registered users page contains description links

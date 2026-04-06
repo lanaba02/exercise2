@@ -14,6 +14,7 @@ public class RegistroData {
     @DateTimeFormat(pattern = "dd-MM-yyyy")
     private Date fechaNacimiento;
     private Boolean admin = false;
+    private Boolean enabled = true; // Nuevo campo para habilitar/deshabilitar usuarios
 
     public String getEmail() {
         return eMail;
@@ -53,5 +54,13 @@ public class RegistroData {
 
     public void setAdmin(Boolean admin) {
         this.admin = admin;
+    }
+
+    public Boolean getEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
     }
 }
