@@ -32,4 +32,11 @@ public class HomeController {
 
         return "about";
     }
+
+    @GetMapping("/registered")
+    public String registeredUsers(Model model) {
+        Iterable<UsuarioData> usuarios = usuarioService.findAll();
+        model.addAttribute("usuarios", usuarios);
+        return "registered";
+    }
 }
