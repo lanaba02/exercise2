@@ -125,8 +125,71 @@ The about page template that displays:
 
 ---
 
+### User List Implementation
+
+#### Overview
+The user list feature provides a public endpoint `/registered` that displays a table of all registered users in the system, showing their identifier (ID) and email address. This feature is accessible to all users without authentication requirements.
+
+#### New Classes & Methods
+
+##### Controller Layer
+- **`HomeController.java`**: Added `registeredUsers()` method
+  - `registeredUsers(Model model)`: Retrieves all users from service and passes them to the view
+
+##### Service Layer
+- **`UsuarioService.java`**: Added `findAll()` method
+  - `findAll()`: Returns all registered users as `Iterable<UsuarioData>`
+
+#### New Thymeleaf Templates
+
+##### `registered.html`
+The user list template that displays:
+- Table with user ID and email columns
+- Responsive Bootstrap table design
+- Empty state message when no users are registered
+- Integrated navbar for consistent navigation
+
+#### Implementation Details
+
+The user list uses a simple table structure to display user information:
+
+```html
+<table class="table table-striped table-hover">
+    <thead class="table-dark">
+        <tr>
+            <th>ID</th>
+            <th>Email</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr th:each="usuario : ${usuarios}">
+            <td th:text="${usuario.id}"></td>
+            <td th:text="${usuario.email}"></td>
+        </tr>
+    </tbody>
+</table>
+```
+
+#### Tests Implemented
+
+##### `UsuarioServiceTest.java`
+- **`servicioFindAllUsuarios()`**: Verifies the `findAll()` method returns all registered users correctly
+
+##### `RegisteredUsersControllerTest.java` (3 comprehensive test cases)
+- **`registeredUsersPageShowsUserList()`**: Validates that the page displays all users with their IDs and emails
+- **`registeredUsersPageShowsEmptyMessageWhenNoUsers()`**: Confirms empty state message appears when no users exist
+- **`registeredUsersPageHasTableStructure()`**: Ensures proper table HTML structure is rendered
+
+#### Key Features
+1. **Public Access**: No authentication required to view registered users
+2. **Complete User List**: Shows all registered users in the system
+3. **Responsive Design**: Bootstrap table adapts to different screen sizes
+4. **Empty State Handling**: Displays appropriate message when no users exist
+5. **Simple Data Display**: Shows only ID and email as specified in requirements
+
+---
+
 ## Repositories & Images
 
 - **GitHub Repository**: [lanaba02/exercise2](https://github.com/lanaba02/exercise2)
 - **DockerHub Image**: To be updated
-
