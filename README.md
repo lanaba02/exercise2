@@ -338,6 +338,73 @@ if (Boolean.TRUE.equals(usuario.getAdmin())) {
 
 ---
 
+### User Listing and User Description Protection Implementation
+
+#### Overview
+The user listing and user description pages are now protected and only accessible to administrator users. Non-admin users attempting to access these pages receive an HTTP 401 Unauthorized error with an appropriate error message. This ensures that sensitive user information is only accessible to authorized administrators.
+
+#### New Classes & Methods
+
+##### Controller Layer Exceptions
+- **`UsuarioNoAdminException.java`**: Custom exception for admin access violations
+  - Returns HTTP 401 Unauthorized with message "Insufficient permissions - Administrator access required"
+
+##### Controller Layer
+- **`HomeController.java`**: Updated with admin authentication checks
+  - `comprobarUsuarioAdmin()`: Validates that current user is logged in and has admin privileges
+  - Updated `registeredUsers()` and `userDescription()` methods with admin checks
+
+#### Implementation Details
+
+The protection mechanism uses a custom exception that leverages Spring's `@ResponseStatus` annotation:
+
+```java
+@ResponseStatus(value = HttpStatus.UNAUTHORIZED, reason="Insufficient permissions - Administrator access required")
+public class UsuarioNoAdminException extends RuntimeException {
+}
+```
+
+Admin validation logic checks both authentication and authorization:
+
+```java
+private void comprobarUsuarioAdmin() {
+    Long idUsuarioLogeado = managerUserSession.usuarioLogeado();
+    if (idUsuarioLogeado == null) {
+        throw new UsuarioNoAdminException();
+    }
+    UsuarioData usuario = usuarioService.findById(idUsuarioLogeado);
+    if (usuario == null || !Boolean.TRUE.equals(usuario.getAdmin())) {
+        throw new UsuarioNoAdminException();
+    }
+}
+```
+
+#### Tests Implemented
+
+##### `RegisteredUsersControllerTest.java` (6 additional test cases)
+- **`registeredUsersPageReturnsUnauthorizedForNonAdminUser()`**: Verifies 401 response for logged-in non-admin users
+- **`registeredUsersPageReturnsUnauthorizedForNotLoggedInUser()`**: Verifies 401 response for unauthenticated users
+- **`userDescriptionPageReturnsUnauthorizedForNonAdminUser()`**: Verifies 401 response for non-admin access to user details
+- **`userDescriptionPageReturnsUnauthorizedForNotLoggedInUser()`**: Verifies 401 response for unauthenticated access to user details
+- Updated existing tests to include admin authentication
+
+#### Key Features
+1. **Admin-Only Access**: User listing and description pages require administrator privileges
+2. **Proper HTTP Status**: Returns 401 Unauthorized for unauthorized access attempts
+3. **Clear Error Messages**: Provides descriptive error messages for insufficient permissions
+4. **Authentication + Authorization**: Checks both login status and admin role
+5. **Consistent Protection**: Both `/registered` and `/registered/{id}` endpoints are protected
+6. **Graceful Error Handling**: Uses Spring's exception handling mechanism for clean error responses
+
+#### Security Considerations
+- **Authentication Required**: Users must be logged in to access protected pages
+- **Role-Based Access**: Only users with `admin = true` can access user management features
+- **HTTP Status Compliance**: Proper 401 status code for unauthorized access
+- **Error Message Clarity**: Clear indication of required permissions
+- **No Information Leakage**: Unauthorized users receive error responses, not redirects
+
+---
+
 ## Repositories & Images
 
 - **GitHub Repository**: [lanaba02/exercise2](https://github.com/lanaba02/exercise2)
