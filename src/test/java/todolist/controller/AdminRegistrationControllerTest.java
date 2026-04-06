@@ -1,5 +1,6 @@
 package todolist.controller;
 
+import todolist.authentication.ManagerUserSession;
 import todolist.dto.RegistroData;
 import todolist.dto.UsuarioData;
 import todolist.service.UsuarioService;
@@ -11,9 +12,11 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.hamcrest.Matchers.*;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -25,6 +28,9 @@ public class AdminRegistrationControllerTest {
 
     @Autowired
     private UsuarioService usuarioService;
+
+    @MockBean
+    private ManagerUserSession managerUserSession;
 
     /**
      * Helper method to add a user to the database

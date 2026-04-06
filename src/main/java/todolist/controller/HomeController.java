@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import todolist.controller.exception.UsuarioNoAdminException;
 
 @Controller
 public class HomeController {
@@ -17,6 +18,17 @@ public class HomeController {
 
     @Autowired
     private UsuarioService usuarioService;
+
+    private void comprobarUsuarioAdmin() {
+        Long idUsuarioLogeado = managerUserSession.usuarioLogeado();
+        if (idUsuarioLogeado == null) {
+            throw new UsuarioNoAdminException();
+        }
+        UsuarioData usuario = usuarioService.findById(idUsuarioLogeado);
+        if (usuario == null || !Boolean.TRUE.equals(usuario.getAdmin())) {
+            throw new UsuarioNoAdminException();
+        }
+    }
 
     @GetMapping("/about")
     public String about(Model model) {
@@ -36,6 +48,7 @@ public class HomeController {
 
     @GetMapping("/registered")
     public String registeredUsers(Model model) {
+        comprobarUsuarioAdmin();
         Iterable<UsuarioData> usuarios = usuarioService.findAll();
         model.addAttribute("usuarios", usuarios);
         return "registered";
@@ -43,6 +56,7 @@ public class HomeController {
 
     @GetMapping("/registered/{id}")
     public String userDescription(@PathVariable Long id, Model model) {
+        comprobarUsuarioAdmin();
         UsuarioData usuario = usuarioService.findById(id);
         if (usuario == null) {
             return "redirect:/registered";
