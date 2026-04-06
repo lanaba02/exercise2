@@ -47,7 +47,12 @@ public class LoginController {
 
             managerUserSession.logearUsuario(usuario.getId());
 
-            return "redirect:/usuarios/" + usuario.getId() + "/tareas";
+            // Redirect admin users to user list, regular users to their tasks
+            if (Boolean.TRUE.equals(usuario.getAdmin())) {
+                return "redirect:/registered";
+            } else {
+                return "redirect:/usuarios/" + usuario.getId() + "/tareas";
+            }
         } else if (loginStatus == UsuarioService.LoginStatus.USER_NOT_FOUND) {
             model.addAttribute("error", "No existe usuario");
             return "formLogin";
@@ -61,6 +66,7 @@ public class LoginController {
     @GetMapping("/registro")
     public String registroForm(Model model) {
         model.addAttribute("registroData", new RegistroData());
+        model.addAttribute("adminExists", usuarioService.existsAdmin());
         return "formRegistro";
     }
 
@@ -68,12 +74,22 @@ public class LoginController {
    public String registroSubmit(@Valid RegistroData registroData, BindingResult result, Model model) {
 
         if (result.hasErrors()) {
+            model.addAttribute("adminExists", usuarioService.existsAdmin());
             return "formRegistro";
         }
 
         if (usuarioService.findByEmail(registroData.getEmail()) != null) {
             model.addAttribute("registroData", registroData);
+            model.addAttribute("adminExists", usuarioService.existsAdmin());
             model.addAttribute("error", "El usuario " + registroData.getEmail() + " ya existe");
+            return "formRegistro";
+        }
+
+        // Check if trying to register as admin when admin already exists
+        if (Boolean.TRUE.equals(registroData.getAdmin()) && usuarioService.existsAdmin()) {
+            model.addAttribute("registroData", registroData);
+            model.addAttribute("adminExists", usuarioService.existsAdmin());
+            model.addAttribute("error", "An administrator already exists in the system");
             return "formRegistro";
         }
 
@@ -82,6 +98,7 @@ public class LoginController {
         usuario.setPassword(registroData.getPassword());
         usuario.setFechaNacimiento(registroData.getFechaNacimiento());
         usuario.setNombre(registroData.getNombre());
+        usuario.setAdmin(registroData.getAdmin());
 
         usuarioService.registrar(usuario);
         return "redirect:/login";
