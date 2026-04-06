@@ -405,6 +405,107 @@ private void comprobarUsuarioAdmin() {
 
 ---
 
+### Blocking Users by Admin Implementation
+
+#### Overview
+The blocking users feature allows administrators to disable or enable user accounts directly from the user management interface. When a user's account is disabled, they cannot log in and will receive an error message indicating their account is disabled. This provides administrators with a way to temporarily or permanently restrict user access.
+
+#### New Classes & Methods
+
+##### Model Layer
+- **`Usuario.java`**: Added `enabled` field
+  - `Boolean enabled`: Indicates if user account is active (defaults to true)
+
+##### DTO Layer
+- **`UsuarioData.java`**: Added `enabled` field
+  - `Boolean getEnabled()` / `setEnabled(Boolean enabled)`: Enabled status accessor methods
+
+- **`RegistroData.java`**: Added `enabled` field
+  - `Boolean getEnabled()` / `setEnabled(Boolean enabled)`: Enabled status during registration (defaults to true)
+
+##### Service Layer
+- **`UsuarioService.java`**: Added `toggleUserEnabled()` method
+  - `toggleUserEnabled(Long usuarioId)`: Toggles the enabled status of a user
+
+##### Controller Layer
+- **`HomeController.java`**: Added `toggleUserStatus()` method
+  - `toggleUserStatus(@PathVariable Long id)`: Handles POST request to `/registered/{id}/toggle-status` to toggle user enabled status
+  - Protected with admin check via `comprobarUsuarioAdmin()`
+
+- **`LoginController.java`**: Updated `loginSubmit()` method
+  - Checks if user is enabled before allowing login
+  - Shows error message if account is disabled
+
+#### Updated Thymeleaf Templates
+
+##### `registered.html` Enhanced
+Added to the user list table:
+- **Status Column**: Shows "Enabled" (green badge) or "Disabled" (red badge) for each user
+- **Actions Column**: Contains toggle buttons to enable/disable users
+  - "Disable" button appears for enabled users (red)
+  - "Enable" button appears for disabled users (green)
+- **Implementation uses Thymeleaf conditionals**: `th:if` and `th:unless` to show appropriate buttons
+
+#### Implementation Details
+
+The toggle button implementation in the template:
+
+```html
+<td>
+    <span th:if="${usuario.enabled}" class="badge bg-success">Enabled</span>
+    <span th:unless="${usuario.enabled}" class="badge bg-danger">Disabled</span>
+</td>
+<td>
+    <form th:action="@{/registered/{id}/toggle-status(id=${usuario.id})}" method="post" style="display:inline;">
+        <button th:if="${usuario.enabled}" type="submit" class="btn btn-danger btn-sm">Disable</button>
+        <button th:unless="${usuario.enabled}" type="submit" class="btn btn-success btn-sm">Enable</button>
+    </form>
+</td>
+```
+
+Login validation logic:
+
+```java
+// Check if user is enabled
+if (!Boolean.TRUE.equals(usuario.getEnabled())) {
+    model.addAttribute("error", "User account is disabled. Contact administrator.");
+    return "formLogin";
+}
+```
+
+#### Tests Implemented
+
+##### `UsuarioServiceTest.java` (2 additional test cases)
+- **`servicioToggleUserEnabled()`**: Tests toggling user enabled status from true to false
+- **`servicioToggleUserEnabledTwice()`**: Tests toggling user status back to enabled
+
+##### `BlockingUsersControllerTest.java` (7 comprehensive test cases)
+- **`disabledUserCannotLogin()`**: Verifies disabled users cannot login
+- **`enabledUserCanLogin()`**: Verifies enabled users can login normally
+- **`registeredUsersPageShowsUserStatus()`**: Confirms status badges appear in user list
+- **`adminCanDisableUser()`**: Tests admin can disable a user
+- **`adminCanEnableUser()`**: Tests admin can enable a disabled user
+- **`nonAdminCannotToggleUserStatus()`**: Verifies non-admin users cannot toggle status
+- **`registeredUsersPageShowsToggleButtons()`**: Confirms toggle buttons appear in table
+
+#### Key Features
+1. **Admin-Controlled Access**: Only administrators can enable/disable users
+2. **Visual Status Indicators**: Color-coded badges show user enabled/disabled status
+3. **One-Click Toggle**: Simple buttons to toggle user status without page navigation
+4. **Login Protection**: Disabled users cannot log into the system
+5. **Clear Error Messages**: Users see appropriate message when account is disabled
+6. **Instant Updates**: Status changes are reflected immediately upon admin action
+7. **Persistent State**: Enabled/disabled status is saved to the database
+
+#### Security Considerations
+- **Admin-Only Protection**: Toggle endpoint is protected with admin check
+- **Database Persistence**: Status changes are stored permanently
+- **Login Validation**: Login process checks enabled status on every attempt
+- **User Feedback**: Clear error messages guide users when blocked
+- **Audit Trail**: Status changes affect user experience directly and visibly
+
+---
+
 ## Repositories & Images
 
 - **GitHub Repository**: [lanaba02/exercise2](https://github.com/lanaba02/exercise2)
