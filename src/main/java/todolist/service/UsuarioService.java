@@ -84,4 +84,15 @@ public class UsuarioService {
         }
         return usuariosData;
     }
+
+    @Transactional(readOnly = true)
+    public boolean existsAdmin() {
+        Iterable<Usuario> usuarios = usuarioRepository.findAll();
+        for (Usuario usuario : usuarios) {
+            if (Boolean.TRUE.equals(usuario.getAdmin())) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

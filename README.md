@@ -250,6 +250,94 @@ The user description page uses a Bootstrap card layout to display user informati
 
 ---
 
+### Admin User Implementation
+
+#### Overview
+The admin user feature allows registration of a single administrator user who has special privileges and different login redirection behavior. Admin users are redirected to the user list page after login, while regular users are redirected to their task pages. Only one administrator can exist in the system.
+
+#### New Classes & Methods
+
+##### Model Layer
+- **`Usuario.java`**: Added `admin` field
+  - `Boolean admin`: Indicates if user has administrator privileges (defaults to false)
+
+##### DTO Layer
+- **`UsuarioData.java`**: Added `admin` field
+  - `Boolean getAdmin()` / `setAdmin(Boolean admin)`: Admin status accessor methods
+
+- **`RegistroData.java`**: Added `admin` field
+  - `Boolean getAdmin()` / `setAdmin(Boolean admin)`: Admin registration flag
+
+##### Service Layer
+- **`UsuarioService.java`**: Added `existsAdmin()` method
+  - `existsAdmin()`: Checks if an administrator user already exists in the system
+
+##### Controller Layer
+- **`LoginController.java`**: Updated registration and login logic
+  - `registroForm()`: Passes `adminExists` flag to conditionally show admin checkbox
+  - `registroSubmit()`: Validates admin registration (only one admin allowed)
+  - `loginSubmit()`: Redirects admin users to `/registered`, regular users to `/usuarios/{id}/tareas`
+
+#### New Thymeleaf Templates/Fragments
+
+##### Updated `formRegistro.html`
+Enhanced registration form with:
+- Conditional admin checkbox that only appears when no administrator exists
+- Bootstrap form-check styling for the checkbox
+- Error handling for admin registration attempts when admin already exists
+
+#### Implementation Details
+
+The admin checkbox is conditionally displayed using Thymeleaf:
+
+```html
+<div class="form-group" th:if="${!adminExists}">
+    <div class="form-check">
+        <input id="admin" class="form-check-input" name="admin" type="checkbox"
+               th:field="*{admin}"/>
+        <label for="admin" class="form-check-label">
+            Register as administrator
+        </label>
+    </div>
+</div>
+```
+
+Admin login redirection logic:
+
+```java
+// Redirect admin users to user list, regular users to their tasks
+if (Boolean.TRUE.equals(usuario.getAdmin())) {
+    return "redirect:/registered";
+} else {
+    return "redirect:/usuarios/" + usuario.getId() + "/tareas";
+}
+```
+
+#### Tests Implemented
+
+##### `UsuarioServiceTest.java` (3 additional test cases)
+- **`servicioExistsAdminReturnsFalseWhenNoAdmin()`**: Verifies false when no admin exists
+- **`servicioExistsAdminReturnsTrueWhenAdminExists()`**: Verifies true when admin exists
+- **`servicioRegistroUsuarioAdmin()`**: Tests admin user registration
+
+##### `AdminRegistrationControllerTest.java` (6 comprehensive test cases)
+- **`registroFormShowsAdminCheckboxWhenNoAdminExists()`**: Verifies checkbox appears when no admin
+- **`registroFormHidesAdminCheckboxWhenAdminExists()`**: Verifies checkbox hidden when admin exists
+- **`registroSubmitCreatesAdminUserWhenNoAdminExists()`**: Tests successful admin registration
+- **`registroSubmitRejectsAdminRegistrationWhenAdminExists()`**: Tests rejection when admin exists
+- **`loginRedirectsAdminToUserList()`**: Verifies admin login redirects to user list
+- **`loginRedirectsRegularUserToTasks()`**: Verifies regular user login redirects to tasks
+
+#### Key Features
+1. **Single Admin Constraint**: Only one administrator can exist in the system
+2. **Conditional UI**: Admin checkbox only appears when no administrator exists
+3. **Special Login Flow**: Admin users are redirected to user management page
+4. **Secure Registration**: Prevents multiple admin registrations
+5. **Backward Compatibility**: Regular users continue to work as before
+6. **Error Handling**: Clear error messages for invalid admin registration attempts
+
+---
+
 ## Repositories & Images
 
 - **GitHub Repository**: [lanaba02/exercise2](https://github.com/lanaba02/exercise2)
