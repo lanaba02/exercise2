@@ -191,4 +191,59 @@ public class UsuarioServiceTest {
         assertThat(foundUsuario1).isTrue();
         assertThat(foundUsuario2).isTrue();
     }
+
+    @Test
+    public void servicioExistsAdminReturnsFalseWhenNoAdmin() {
+        // GIVEN
+        // Un usuario regular en la BD (no admin)
+        addUsuarioBD();
+
+        // WHEN
+        // verificamos si existe un administrador
+        boolean existsAdmin = usuarioService.existsAdmin();
+
+        // THEN
+        // debe devolver false
+        assertThat(existsAdmin).isFalse();
+    }
+
+    @Test
+    public void servicioExistsAdminReturnsTrueWhenAdminExists() {
+        // GIVEN
+        // Un usuario regular y un administrador en la BD
+        addUsuarioBD();
+
+        UsuarioData admin = new UsuarioData();
+        admin.setEmail("admin@umh.es");
+        admin.setNombre("Administrator");
+        admin.setPassword("admin123");
+        admin.setAdmin(true);
+        usuarioService.registrar(admin);
+
+        // WHEN
+        // verificamos si existe un administrador
+        boolean existsAdmin = usuarioService.existsAdmin();
+
+        // THEN
+        // debe devolver true
+        assertThat(existsAdmin).isTrue();
+    }
+
+    @Test
+    public void servicioRegistroUsuarioAdmin() {
+        // WHEN
+        // Registramos un usuario como administrador
+        UsuarioData usuario = new UsuarioData();
+        usuario.setEmail("admin@umh.es");
+        usuario.setPassword("admin123");
+        usuario.setAdmin(true);
+
+        usuarioService.registrar(usuario);
+
+        // THEN
+        // el usuario se añade correctamente como administrador
+        UsuarioData usuarioBD = usuarioService.findByEmail("admin@umh.es");
+        assertThat(usuarioBD).isNotNull();
+        assertThat(usuarioBD.getAdmin()).isTrue();
+    }
 }
