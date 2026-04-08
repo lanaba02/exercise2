@@ -2,6 +2,9 @@
 
 ToDoList app using Spring Boot and Thymeleaf templates.
 
+## Version
+**1.1.0** - Released: 8/4/2026
+
 ## Requirements
 
 You need install on your system:
