@@ -1,0 +1,12 @@
+todolist/repository/UsuarioTest.class
+todolist/controller/UsuarioWebTest.class
+todolist/service/UsuarioServiceTest.class
+todolist/service/NavbarServiceTest.class
+todolist/controller/TareaWebTest.class
+todolist/controller/RegisteredUsersControllerTest.class
+todolist/controller/NavbarControllerTest.class
+todolist/controller/BlockingUsersControllerTest.class
+todolist/service/TareaServiceTest.class
+todolist/repository/TareaTest.class
+todolist/controller/AboutPageTest.class
+todolist/controller/AdminRegistrationControllerTest.class
